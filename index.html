@@ -516,6 +516,7 @@
       <div class="plan destacado">
         <div class="p-tag">NIVEL 1</div>
         <div class="p-name">Zona de Combate</div>
+        <div class="p-tagline">Negocio y mentalidad — no funciona uno sin el otro.</div>
         <div class="p-tagline">La base que nunca se apaga.</div>
         <div class="p-price">97€<span>/mes</span></div>
         <div class="p-badge">Primeras 20 plazas a 97€/mes — después sube a 127€.</div>
@@ -534,6 +535,7 @@
       <div class="plan">
         <div class="p-tag">NIVEL 2 · PRECIO DE LANZAMIENTO</div>
         <div class="p-name">Reconquista</div>
+        <div class="p-tagline">90 días para instalar una mentalidad que no se apaga.</div>
         <div class="p-tagline">90 días. Principio y final.</div>
         <div class="p-price">197€<span>/único · 90 días</span></div>
         <div class="p-note urgente">PRECIO DE LANZAMIENTO · PRIMEROS CASOS DE ÉXITO</div>
@@ -551,12 +553,13 @@
       </div>
 
       <div class="plan cima">
-        <div class="p-badge">SOLO 2 PLAZAS</div>
+        <div class="p-badge">SOLO 1 PLAZA</div>
         <div class="p-tag">NIVEL 3</div>
         <div class="p-name">Mano a Mano</div>
+        <div class="p-tagline">Mentalidad de ejecución, cara a cara, sin excusas.</div>
         <div class="p-tagline">Acceso directo. Sin compartir turno.</div>
         <div class="p-price">297€</div>
-        <div class="p-note urgente" id="plazas-counter">QUEDAN 2 PLAZAS DISPONIBLES</div>
+        <div class="p-note urgente" id="plazas-counter">QUEDA 1 PLAZA DISPONIBLE</div>
         <ul class="p-features">
           <li>Sesiones 1 a 1 conmigo, sin grupo de por medio</li>
           <li><b>WhatsApp directo</b> para dudas del día a día, no solo en sesión</li>
@@ -577,7 +580,7 @@
         <div class="cp-arrow">→</div>
         <div class="cp-step"><div class="cp-num">2</div>Confirmamos tu plaza</div>
         <div class="cp-arrow">→</div>
-        <div class="cp-step"><div class="cp-num">3</div>Pagas por Bizum</div>
+        <div class="cp-step"><div class="cp-num">3</div>Pagas por Bizum o transferencia bancaria</div>
         <div class="cp-arrow">→</div>
         <div class="cp-step"><div class="cp-num">4</div>Empiezas</div>
       </div>
@@ -658,10 +661,10 @@
   // WhatsApp routing con mensajes distintos según plan
   const WA_NUMBER = '34653108145';
   const messages = {
-    zona: 'Hola Germán, voy con todo. Quiero entrar a Renacer',
-    reconquista: 'Hola Germán, voy con todo. Quiero entrar a Renacer',
-    manoamano: 'Hola Germán, voy con todo. Quiero entrar a Renacer',
-    general: 'Hola Germán, voy con todo. Quiero entrar a Renacer'
+    zona: 'Hola Germán, voy con todo, quiero entrar a Renacer.',
+    reconquista: 'Hola Germán, voy con todo, quiero entrar a Renacer.',
+    manoamano: 'Hola Germán, voy con todo, quiero entrar a Renacer.',
+    general: 'Hola Germán, voy con todo, quiero entrar a Renacer.'
   };
 
   document.querySelectorAll('[data-wa]').forEach(el=>{
