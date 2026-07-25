@@ -311,6 +311,15 @@
   .plan.destacado{padding-top:60px;}
   .plan.cima{background:linear-gradient(160deg, #1a1005, var(--black) 60%);border-top:2px solid var(--gold);}
 
+  .plan.popular{border:1px solid rgba(201,162,39,.5);box-shadow:0 0 40px rgba(201,162,39,.14);}
+  .plan.popular::before{
+    content:'MÁS ELEGIDO';position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+    background:var(--gold);color:var(--black);
+    font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.08em;
+    padding:6px 16px;border-radius:20px;white-space:nowrap;
+    box-shadow:0 4px 14px rgba(201,162,39,.35);
+  }
+
   .p-tag{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);letter-spacing:.1em;margin-bottom:14px;}
   .p-name{font-family:'Archivo Black',sans-serif;font-size:24px;line-height:1.1;margin-bottom:8px;}
   .plan.cima .p-name{color:var(--gold);}
@@ -400,29 +409,17 @@
   @media(max-width:640px){.lead-trust{flex-direction:column;align-items:flex-start;gap:16px;margin:8px 0 36px;}}
 
   .lead-form-wrap{
-    position:relative;max-width:660px;margin:0 auto;
+    max-width:660px;margin:0 auto;
     background:#0d0d0d;border:1px solid rgba(201,162,39,.25);
     border-radius:16px;padding:36px;
     box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 40px rgba(201,162,39,.07);
-    min-height:1320px;
+    height:1300px;
   }
-  .lead-form-wrap iframe{position:relative;z-index:1;min-height:1264px;}
+  .lead-form-wrap iframe{display:block;background:#0d0d0d;}
+  .lead-form-wrap .ep-iFrameContainer, .lead-form-wrap .ep-wrapper{height:100%;}
   @media(max-width:640px){
-    .lead-form-wrap{padding:20px;border-radius:12px;min-height:1520px;}
-    .lead-form-wrap iframe{min-height:1460px;}
+    .lead-form-wrap{padding:20px;border-radius:12px;height:1500px;}
   }
-
-  .lead-form-skeleton{
-    position:absolute;inset:36px;z-index:2;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
-    background:#0d0d0d;border-radius:8px;
-    transition:opacity .3s ease;
-  }
-  .lead-form-skeleton.is-hidden{opacity:0;pointer-events:none;}
-  @media(max-width:640px){.lead-form-skeleton{inset:20px;}}
-  .lead-spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--ember);animation:leadSpin .8s linear infinite;}
-  @keyframes leadSpin{to{transform:rotate(360deg);}}
-  .lead-skeleton-text{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);letter-spacing:.08em;}
 
   .lead-microcopy{text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);letter-spacing:.03em;margin-top:20px;}
 
@@ -577,7 +574,7 @@
         <a href="#" class="p-cta" data-wa="zona">ESCRIBIR POR WHATSAPP</a>
       </div>
 
-      <div class="plan">
+      <div class="plan popular">
         <div class="p-tag">NIVEL 2 · PRECIO DE LANZAMIENTO</div>
         <div class="p-name">Reconquista</div>
         <div class="p-tagline">No es un curso. Es una reconquista de ti mismo.</div>
@@ -690,7 +687,6 @@
     <div class="sec-head" style="max-width:100%;text-align:center;margin-left:auto;margin-right:auto;margin-bottom:36px;">
       <div class="sec-eyebrow">EL PRIMER PASO</div>
       <h2 class="sec-title">¿Vas a seguir esperando el momento perfecto?</h2>
-      <p class="sec-desc">Ahora mismo queda 1 plaza en Mano a Mano, y las primeras 20 plazas de Zona de Combate siguen a 97€/mes antes de subir a 127€. Deja tus datos y te escribo yo mismo — sin bots, sin esperas eternas.</p>
     </div>
 
     <div class="lead-trust">
@@ -709,10 +705,6 @@
     </div>
 
     <div class="lead-form-wrap">
-      <div class="lead-form-skeleton" id="leadFormSkeleton">
-        <div class="lead-spinner"></div>
-        <div class="lead-skeleton-text">CARGANDO FORMULARIO…</div>
-      </div>
       <iframe
           src="https://api.leadconnectorhq.com/widget/form/WWkU1UK2zmO2JXfUkGnL"
           style="width:100%;height:100%;border:none;border-radius:8px"
@@ -729,7 +721,6 @@
           data-layout-iframe-id="inline-WWkU1UK2zmO2JXfUkGnL"
           data-form-id="WWkU1UK2zmO2JXfUkGnL"
           title="Form 0"
-          loading="lazy"
       >
       </iframe>
     </div>
@@ -796,18 +787,20 @@
   }, {threshold:.2});
   document.querySelectorAll('.t-item').forEach(el=>observer.observe(el));
 
-  // Ocultar skeleton del formulario de leads cuando el iframe carga (o a los 4.5s como respaldo)
+  // Respaldo: form_embed.js oculta el iframe (opacity/visibility/left:-9999px) hasta
+  // confirmar por postMessage que el formulario cargó. Si esa señal no llega, lo forzamos visible.
   const leadIframe = document.getElementById('inline-WWkU1UK2zmO2JXfUkGnL');
-  const leadSkeleton = document.getElementById('leadFormSkeleton');
-  if(leadIframe && leadSkeleton){
-    let leadFormRevealed = false;
-    const revealLeadForm = ()=>{
-      if(leadFormRevealed) return;
-      leadFormRevealed = true;
-      leadSkeleton.classList.add('is-hidden');
-    };
-    leadIframe.addEventListener('load', revealLeadForm);
-    setTimeout(revealLeadForm, 4500);
+  if(leadIframe){
+    setTimeout(()=>{
+      const cs = getComputedStyle(leadIframe);
+      if(cs.visibility === 'hidden' || cs.opacity === '0'){
+        leadIframe.style.removeProperty('visibility');
+        leadIframe.style.removeProperty('opacity');
+        leadIframe.style.removeProperty('pointer-events');
+        leadIframe.style.removeProperty('left');
+        leadIframe.style.removeProperty('position');
+      }
+    }, 5000);
   }
 </script>
 
