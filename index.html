@@ -174,6 +174,15 @@
     transition:color .2s, border-color .2s;
   }
   .btn-ghost:hover{color:var(--white);border-color:var(--white);}
+  .btn-gold{
+    font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;
+    color:var(--gold);background:transparent;border:1px solid var(--gold);
+    padding:16px 30px;
+    display:inline-flex;align-items:center;gap:10px;
+    transition:transform .2s, background .2s;
+    letter-spacing:.01em;
+  }
+  .btn-gold:hover{background:rgba(201,162,39,.1);transform:translateY(-2px);}
 
   .hero-proof{
     margin-top:56px;padding-top:26px;border-top:1px solid var(--line);
@@ -456,6 +465,7 @@
       <p class="hero-sub2">Se empieza roto o no se empieza nunca. Esto es el sistema real que usé para facturar en 15 días desde cero, con un móvil y sin inversión.</p>
       <div class="hero-actions">
         <a href="#planes" class="btn-primary">QUIERO ENTRAR →</a>
+        <a href="#contacto" class="btn-gold">RELLENA EL FORMULARIO GRATIS →</a>
         <a href="#historia" class="btn-ghost">VER LA HISTORIA COMPLETA</a>
       </div>
       <div class="hero-proof">
@@ -786,11 +796,18 @@
   }, {threshold:.2});
   document.querySelectorAll('.t-item').forEach(el=>observer.observe(el));
 
-  // Ocultar skeleton del formulario de leads cuando el iframe carga
+  // Ocultar skeleton del formulario de leads cuando el iframe carga (o a los 4.5s como respaldo)
   const leadIframe = document.getElementById('inline-WWkU1UK2zmO2JXfUkGnL');
   const leadSkeleton = document.getElementById('leadFormSkeleton');
   if(leadIframe && leadSkeleton){
-    leadIframe.addEventListener('load', ()=> leadSkeleton.classList.add('is-hidden'));
+    let leadFormRevealed = false;
+    const revealLeadForm = ()=>{
+      if(leadFormRevealed) return;
+      leadFormRevealed = true;
+      leadSkeleton.classList.add('is-hidden');
+    };
+    leadIframe.addEventListener('load', revealLeadForm);
+    setTimeout(revealLeadForm, 4500);
   }
 </script>
 
