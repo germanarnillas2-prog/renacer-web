@@ -91,6 +91,80 @@ html.lenis body {
   transition-behavior: allow-discrete;
 }
 
+/* =========================================================
+   ANIMACIONES AÑADIDAS
+   Todas las de puntero van tras (hover:hover) and (pointer:fine): en un móvil
+   el navegador ni siquiera evalúa estas reglas y el JS no se engancha.
+   ========================================================= */
+
+/* A · Cursor magnético. Borde oscuro + halo blanco: se ve sobre hueso y sobre tinta
+   sin necesidad de mezclas (mix-blend-mode obligaría a recomponer capas cada fotograma). */
+.c-cursor {
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 200;
+  width: 30px; height: 30px;
+  margin: -15px 0 0 -15px;
+  border: 1px solid rgba(var(--ink-rgb), .5);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .3);
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+  transition: opacity .3s, width .35s var(--ease-btn), height .35s var(--ease-btn),
+              margin .35s var(--ease-btn), background-color .35s var(--ease-btn), border-color .35s;
+}
+.c-cursor.is-on { opacity: 1; }
+.c-cursor.is-over {
+  width: 54px; height: 54px; margin: -27px 0 0 -27px;
+  background-color: rgba(206, 247, 158, .3);
+  border-color: transparent;
+}
+@media (hover: none), (pointer: coarse) { .c-cursor { display: none; } }
+
+/* C · Tarjetas de servicio: inclinación hacia el puntero y foco que lo sigue.
+   Solo transform y opacity, que compone la GPU; no hay repintado. */
+@media (hover: hover) and (pointer: fine) {
+  .c-usp-cards .cards_item { transition: transform .5s var(--ease-1); transform-style: preserve-3d; }
+  .c-usp-cards .cards_item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .45s var(--ease-1);
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(206, 247, 158, .22), transparent 62%);
+  }
+  .c-usp-cards .cards_item.is-lit::after { opacity: 1; }
+  .c-usp-cards .-ink.cards_item::after { background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(206, 247, 158, .16), transparent 62%); }
+}
+
+/* D · Luz que recorre la línea del proceso. La animación solo existe mientras la
+   sección está en pantalla: el JS pone y quita .is-running con un IntersectionObserver. */
+.timeline .tl_track { overflow: hidden; }
+.timeline .tl_spark {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 38%;
+  border-radius: 2px;
+  background: linear-gradient(180deg, transparent, var(--color-lime), transparent);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.timeline.is-running .tl_spark { opacity: .85; animation: tl-spark 3.2s linear infinite; }
+@keyframes tl-spark { from { transform: translateY(-110%); } to { transform: translateY(300%); } }
+
+/* E · Micro-física al pulsar */
+html.motion .btn1, html.motion .stickycta_btn { transition: transform .4s var(--ease-btn); }
+html.motion .btn1.is-pressed, html.motion .stickycta_btn.is-pressed { transform: scale(.965); }
+
+@media (prefers-reduced-motion: reduce) {
+  .timeline.is-running .tl_spark { animation: none; }
+  .c-cursor { display: none; }
+}
+
 </style>
   <style>
 /* =========================================================
@@ -2896,14 +2970,15 @@ html.reduced-motion .text-reveal-overlay { display: none; }
   // Velocidad de scroll compartida (píxeles por segundo, suavizada). Los fondos decorativos
   // la usan para saltarse fotogramas cuando la página va muy rápida: a 1500 px/s nadie
   // distingue el detalle de la red, y el hilo principal queda libre para mover el scroll.
-  let scrollVel = 0;
+  let scrollVel = 0, scrollVelSigned = 0;
   let velY = window.scrollY, velT = performance.now();
   const sampleVel = () => {
     const now = performance.now(), sy = window.scrollY;
     const dt = now - velT;
     if (dt >= 8) {
-      const v = Math.abs(sy - velY) / dt * 1000;
-      scrollVel += (v - scrollVel) * 0.35;
+      const vs = (sy - velY) / dt * 1000;
+      scrollVelSigned += (vs - scrollVelSigned) * 0.35;
+      scrollVel += (Math.abs(vs) - scrollVel) * 0.35;
       velY = sy; velT = now;
     }
   };
@@ -3298,6 +3373,13 @@ html.reduced-motion .text-reveal-overlay { display: none; }
     update(dt, now) {
       const p = this.ptr;
       p.real = now - p.last <= 2500;
+      // Muelle de inercia por scroll: acelera hacia el objetivo, roza y se pasa un poco
+      // al frenar, que es lo que da la sensación de peso. Cuatro multiplicaciones por fotograma.
+      const objetivo = Math.max(-70, Math.min(70, scrollVelSigned * 0.035));
+      this.dragV = (this.dragV || 0) + (objetivo - (this.drag || 0)) * 0.1;
+      this.dragV *= 0.84;
+      this.drag = (this.drag || 0) + this.dragV;
+
       if (!p.real) {
         // Sin interacción, el "cursor" deriva solo: la red sigue viva en móvil
         p.tx = 0.5 + 0.3 * Math.sin(now * 0.00021 + this.seed);
@@ -3312,14 +3394,17 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       // móvil justo se alivia enseguida y un ordenador no se queda degradado para siempre.
       this.frames++;
       if (dt > 20) this.slow++;
+      this.cool = Math.max(0, (this.cool || 0) - 1);
       if (this.frames >= 30) {
         const malos = this.slow / this.frames;
-        if (malos > 0.4 && this.quality > 0.4) {
-          this.quality = Math.max(0.4, this.quality - 0.15);
-          this.build();
-        } else if (malos < 0.05 && this.quality < 1) {
-          this.quality = Math.min(1, this.quality + 0.1);
-          this.build();
+        // build() reconstruye los arrays de nodos: es caro. Tras cada cambio se espera
+        // (3 s al bajar, 8 s al subir) para no quedarse rebotando entre dos calidades.
+        if (!this.cool) {
+          if (malos > 0.4 && this.quality > 0.4) {
+            this.quality = Math.max(0.4, this.quality - 0.15); this.build(); this.cool = 180;
+          } else if (malos < 0.03 && this.quality < 1) {
+            this.quality = Math.min(1, this.quality + 0.1); this.build(); this.cool = 480;
+          }
         }
         this.frames = 0; this.slow = 0;
       }
@@ -3336,6 +3421,9 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       const vh = window.innerHeight;
       const sc = Math.max(-1.2, Math.min(1.2, (this.zoneMid - window.scrollY - vh / 2) / vh));
       const pxOff = this.ptr.x - 0.5, pyOff = this.ptr.y - 0.5;
+      // Inercia: los nodos se quedan atrás al desplazarse y vuelven con rebote.
+      // Es una suma por nodo; no añade ni un trazo nuevo al dibujo.
+      const drag = this.drag || 0;
       const tt = t * 0.00006;
       // Líneas y atracción hacia el cursor solo con un cursor o dedo real (no con la deriva automática)
       const real = !!this.ptr.real;
@@ -3346,7 +3434,7 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       for (let i = 0; i < n; i++) {
         const k = z[i];
         let x = bx[i] + noise3(bx[i] * 0.002, by[i] * 0.002, tt) * 70 * k - pxOff * 60 * k;
-        let y = by[i] + noise3(by[i] * 0.002, bx[i] * 0.002 + 7, tt) * 70 * k - pyOff * 44 * k - sc * 90 * k;
+        let y = by[i] + noise3(by[i] * 0.002, bx[i] * 0.002 + 7, tt) * 70 * k - pyOff * 44 * k - sc * 90 * k + drag * k;
         const dx = mx - x, dy = my - y, d = Math.sqrt(dx * dx + dy * dy);
         if (real && d < 200) { const f = (1 - d / 200) * 14 * k; x += dx / (d + 1) * f; y += dy / (d + 1) * f; }
         px[i] = x; py[i] = y; pd[i] = real ? d : 1e9;
@@ -3474,6 +3562,7 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       this.coarse = window.matchMedia('(pointer: coarse)').matches;
       // Densidad: unos 1,8 veces más puntos que la primera versión (con tope y ajuste automático)
       this.maxNodes = this.coarse ? 200 : 420;
+      this.maxNodesBase = this.maxNodes;   // techo al que puede volver si el aparato aguanta
       this.count = 0;
       this.pulses = [];
       this.visible = false;
@@ -3516,7 +3605,11 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       this.key = key;
       // Resolución real de la pantalla (hasta 3×) para que letras y líneas se vean nítidas;
       // el lienzo es pequeño y el tope de 2,5 Mpx evita excesos en pantallas grandes
-      const dpr = Math.min(window.devicePixelRatio || 1, 3, Math.sqrt(2.5e6 / (w * h)));
+      // Cada fotograma hace tres pasadas de drawImage sobre todo el lienzo (máscara, piel y
+      // red), así que los píxeles cuestan el triple que en los otros fondos. Se topa a 1,25
+      // en táctil y a 2 en escritorio, y el tope total baja de 2,5 a 1,6 millones de píxeles.
+      const coarse = this.coarse;
+      const dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1.25 : 2, Math.sqrt(1.6e6 / (w * h)));
       this.w = w; this.h = h; this.dpr = dpr;
       this.c.width = Math.round(w * dpr); this.c.height = Math.round(h * dpr);
       const font = `400 ${fs}px ${cs.fontFamily}`;
@@ -3725,11 +3818,28 @@ html.reduced-motion .text-reveal-overlay { display: none; }
         if (!this.visible || document.hidden) { this.raf = 0; return; }
         const dt = last ? Math.min(now - last, 40) : 16;
         last = now;
-        const t0 = performance.now();
-        this.draw(dt);
-        // Ajuste automático: si durante ~0,75 s cada fotograma pasa de 4 ms, menos puntos
-        this.slowRun = performance.now() - t0 > 4 ? this.slowRun + 1 : 0;
-        if (this.slowRun > 45 && this.maxNodes > 60) { this.maxNodes = Math.round(this.maxNodes * 0.7); this.slowRun = 0; this.build(); }
+        // Con la página moviéndose rápido se dibuja uno de cada dos fotogramas: a esa
+        // velocidad el logotipo pasa volando y nadie distingue los puntos.
+        this.half = scrollVel > 1500 ? !this.half : false;
+        if (!this.half) {
+          const t0 = performance.now();
+          this.draw(dt);
+          // Ajuste automático con ventana de 30 fotogramas (antes 45 seguidos y solo podía
+          // bajar). El listón es 4 ms de dibujo; si el aparato aguanta, los puntos vuelven.
+          this.frames = (this.frames || 0) + 1;
+          if (performance.now() - t0 > 4) this.slowRun++;
+          this.cool = Math.max(0, (this.cool || 0) - 1);
+          if (this.frames >= 30) {
+            const malos = this.slowRun / this.frames;
+            // Mismo criterio que en la red del hero: reconstruir cuesta, así que se espera
+            // entre cambios en vez de corregir cada medio segundo.
+            if (!this.cool) {
+              if (malos > 0.4 && this.maxNodes > 60) { this.maxNodes = Math.round(this.maxNodes * 0.75); this.build(); this.cool = 180; }
+              else if (malos < 0.03 && this.maxNodes < this.maxNodesBase) { this.maxNodes = Math.min(this.maxNodesBase, Math.round(this.maxNodes * 1.2)); this.build(); this.cool = 480; }
+            }
+            this.frames = 0; this.slowRun = 0;
+          }
+        }
         this.raf = requestAnimationFrame(tick);
       };
       this.raf = requestAnimationFrame(tick);
@@ -5387,6 +5497,8 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       const under = document.elementFromPoint(e.clientX, e.clientY);
       if (!under || under.closest(SEL) !== el) { el.classList.remove('is-pressed'); return; }
       if (!el.classList.contains('is-pressed')) show(el);
+      // Respuesta física en el móvil: 8 ms, apenas un golpecito
+      if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.isActive)) { try { navigator.vibrate(8); } catch (_) {} }
       timers.set(el, setTimeout(() => el.classList.remove('is-pressed'), Math.max(0, 420 - (performance.now() - shownAt))));
     }, { passive: true });
     // El dedo empezó a hacer scroll: el navegador cancela el toque
@@ -5395,6 +5507,113 @@ html.reduced-motion .text-reveal-overlay { display: none; }
     document.addEventListener('touchstart', () => {}, { passive: true });
     // Al volver atrás con el navegador no debe quedar ningún botón marcado
     window.addEventListener('pageshow', (e) => { if (e.persisted) document.querySelectorAll('.is-pressed').forEach((el) => el.classList.remove('is-pressed')); });
+  }
+
+
+  /* =========================================================
+     A · CURSOR MAGNÉTICO (solo ratón o trackpad)
+     Un anillo persigue al puntero con inercia y crece sobre lo pulsable; los botones
+     tiran ligeramente hacia él. El bucle solo vive mientras algo se está moviendo:
+     cuando el anillo alcanza al cursor y los botones vuelven a su sitio, se apaga.
+     ========================================================= */
+  function initCursor() {
+    if (!MOTION || !FINE) return;
+    const ring = document.createElement('div');
+    ring.className = 'c-cursor';
+    ring.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(ring);
+
+    const SEL = '.btn1, .item_btn, .menu_link, .reel_link, .web_link, .member_link, .diag_rows button, .net_svc button, .diag_ghost, .menu_btn, .footer_scroll-btn';
+    const imanes = new WeakMap();
+    let px = 0, py = 0, rx = 0, ry = 0, raf = 0, visto = false, sobre = null;
+
+    const bucle = () => {
+      raf = 0;
+      rx += (px - rx) * 0.2; ry += (py - ry) * 0.2;
+      ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
+      let vivo = Math.abs(px - rx) > 0.25 || Math.abs(py - ry) > 0.25;
+
+      if (sobre) {
+        const r = sobre.getBoundingClientRect();
+        const dx = px - (r.left + r.width / 2), dy = py - (r.top + r.height / 2);
+        const s = imanes.get(sobre) || { x: 0, y: 0 };
+        // Tirón topado a 6 px: se nota, pero el botón nunca se va de su sitio
+        const tx = Math.max(-6, Math.min(6, dx * 0.22)), ty = Math.max(-6, Math.min(6, dy * 0.3));
+        s.x += (tx - s.x) * 0.22; s.y += (ty - s.y) * 0.22;
+        imanes.set(sobre, s);
+        sobre.style.transform = 'translate3d(' + s.x.toFixed(2) + 'px,' + s.y.toFixed(2) + 'px,0)';
+        if (Math.abs(tx - s.x) > 0.05 || Math.abs(ty - s.y) > 0.05) vivo = true;
+      }
+      if (vivo) raf = requestAnimationFrame(bucle);
+    };
+
+    const soltar = (el) => {
+      if (!el) return;
+      const s = imanes.get(el);
+      if (!s) { el.style.transform = ''; return; }
+      // Vuelta suave a su sitio con la transición de CSS, sin bucle
+      el.style.transform = '';
+      imanes.delete(el);
+    };
+
+    window.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      px = e.clientX; py = e.clientY;
+      if (!visto) { visto = true; rx = px; ry = py; ring.classList.add('is-on'); }
+      const bajo = e.target.closest ? e.target.closest(SEL) : null;
+      if (bajo !== sobre) {
+        soltar(sobre);
+        sobre = bajo;
+        ring.classList.toggle('is-over', !!sobre);
+      }
+      if (!raf) raf = requestAnimationFrame(bucle);
+    }, { passive: true });
+
+    document.addEventListener('pointerleave', () => { ring.classList.remove('is-on'); soltar(sobre); sobre = null; });
+    window.addEventListener('blur', () => { ring.classList.remove('is-on'); soltar(sobre); sobre = null; });
+  }
+
+  /* =========================================================
+     C · TARJETAS DE SERVICIO: INCLINACIÓN Y FOCO (solo ratón)
+     Un rAF por tarjeta como mucho, y solo mientras el puntero está encima.
+     ========================================================= */
+  function initTilt() {
+    if (!MOTION || !FINE) return;
+    document.querySelectorAll('.c-usp-cards .cards_item').forEach((card) => {
+      let raf = 0, mx = 50, my = 50, rx = 0, ry = 0;
+      card.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') card.classList.add('is-lit'); });
+      card.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        const r = card.getBoundingClientRect();
+        mx = ((e.clientX - r.left) / r.width) * 100;
+        my = ((e.clientY - r.top) / r.height) * 100;
+        rx = ((my - 50) / 50) * -5; ry = ((mx - 50) / 50) * 5;
+        if (!raf) raf = requestAnimationFrame(() => {
+          raf = 0;
+          card.style.setProperty('--mx', mx.toFixed(1) + '%');
+          card.style.setProperty('--my', my.toFixed(1) + '%');
+          card.style.transform = 'perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
+        });
+      }, { passive: true });
+      card.addEventListener('pointerleave', () => { card.classList.remove('is-lit'); card.style.transform = ''; });
+    });
+  }
+
+  /* =========================================================
+     D · LUZ QUE RECORRE LA LÍNEA DEL PROCESO
+     Es CSS puro sobre un elemento de 2 px de ancho. El observador quita la clase
+     cuando la sección sale de pantalla y el navegador para la animación del todo.
+     ========================================================= */
+  function initTrackLight() {
+    if (!MOTION) return;
+    const tl = document.querySelector('.timeline');
+    if (!tl || !tl.querySelector('.tl_track')) return;
+    const spark = document.createElement('span');
+    spark.className = 'tl_spark';
+    spark.setAttribute('aria-hidden', 'true');
+    tl.querySelector('.tl_track').appendChild(spark);
+    new IntersectionObserver(([e]) => tl.classList.toggle('is-running', e.isIntersecting))
+      .observe(tl);
   }
 
   /* =========================================================
@@ -5413,12 +5632,15 @@ html.reduced-motion .text-reveal-overlay { display: none; }
   await yieldMain();
   initFooter();
   initCounters();
+  initTrackLight();
   updatePills();
   updateCardsReveal();
 
   if (MOTION) {
     await yieldMain();
     const mm = gsap.matchMedia();
+    initCursor();
+    initTilt();
     if (hero) buildHeroScroll();
     await yieldMain();
     initCards(mm);
