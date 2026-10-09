@@ -1360,6 +1360,8 @@ html.motion .c-usp-cards .cards_item.is-drawn .card_icon svg *:nth-child(n+4) { 
 /* ---------- Tarjetas de web (marco de navegador) ---------- */
 .c-posts .webs { display: grid; gap: 16px; list-style: none; margin: 0; padding: 0; }
 @media (min-width: 760px) { .c-posts .webs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Con una sola web, media rejilla vacía queda descompensada: se acota a un ancho de tarjeta */
+.c-posts .webs:has(> li:only-child) { max-width: 520px; }
 .c-posts .web_link {
   display: flex;
   flex-direction: column;
@@ -2281,10 +2283,10 @@ html.reduced-motion .text-reveal-overlay { display: none; }
             <div class="card_bottom">
               <span class="card_label">Ser encontrado</span>
               <h3 class="card_heading">Presencia y redes</h3>
-              <p class="card_text">Gestionamos tus redes con contenido propio de foto y vídeo, y cuidamos tu web y tu ficha de Google para que quien te busque encuentre un negocio atractivo y de confianza. <strong class="u-strong">Cada pieza se distribuye en Instagram, TikTok, Facebook y YouTube Shorts</strong> para multiplicar el alcance sin multiplicar el trabajo.</p>
+              <p class="card_text">Vamos a tu negocio a grabar: <strong class="u-strong">la sesión de foto y vídeo va incluida</strong>. Cuidamos tu web, tu ficha de Google y las reseñas que ya tienes, y <strong class="u-strong">cada pieza se publica en Instagram, TikTok, Facebook y YouTube Shorts</strong> para multiplicar el alcance sin multiplicar el trabajo.</p>
               <p class="card_price">
                 <span class="price_part"><span class="price_from">Desde</span><span class="price_fig">275 €<span class="price_per">/mes</span></span></span>
-                <span class="price_note">Sesión de foto y vídeo presencial aparte · Precios sin IVA</span>
+                <span class="price_note">Sesión de foto y vídeo en tu negocio incluida · Precios sin IVA</span>
               </p>
             </div>
           </li>
@@ -2319,7 +2321,7 @@ html.reduced-motion .text-reveal-overlay { display: none; }
             <div class="card_bottom">
               <span class="card_label">Automatizar</span>
               <h3 class="card_heading">Sistemas e IA</h3>
-              <p class="card_text">WhatsApp que responde solo, agenda, reseñas, CRM y agentes de voz con IA que atienden, recuerdan y fidelizan a tus clientes sin tareas repetitivas.</p>
+              <p class="card_text">WhatsApp que responde solo, agenda, CRM y agentes de voz con IA que atienden sin tareas repetitivas. Y cuando el cliente se va, el sistema sigue: <strong class="u-strong">le pide la reseña en el mejor momento y le invita a volver</strong>.</p>
               <p class="card_price">
                 <span class="price_part"><span class="price_from">Desde</span><span class="price_fig">200 €</span><span class="price_from">de implantación</span></span>
                 <span class="price_part"><span class="price_plus" aria-hidden="true">+</span><span class="price_fig">50 €<span class="price_per">/mes</span></span></span>
@@ -2457,19 +2459,6 @@ html.reduced-motion .text-reveal-overlay { display: none; }
                 <span class="web_shot"></span>
                 <span class="web_foot">
                   <span class="web_title">Dilo Ibiza</span>
-                  <span class="web_meta">Ver la web<span class="u-sr"> (se abre en otra pestaña)</span></span>
-                </span>
-              </a>
-            </li>
-            <li class="inview-element">
-              <a class="web_link" href="https://llongueras.com" target="_blank" rel="noopener noreferrer">
-                <span class="web_chrome">
-                  <span class="web_dots" aria-hidden="true"><span></span><span></span><span></span></span>
-                  <span class="web_url">llongueras.com</span>
-                </span>
-                <span class="web_shot"></span>
-                <span class="web_foot">
-                  <span class="web_title">Llongueras</span>
                   <span class="web_meta">Ver la web<span class="u-sr"> (se abre en otra pestaña)</span></span>
                 </span>
               </a>
@@ -2831,28 +2820,80 @@ html.reduced-motion .text-reveal-overlay { display: none; }
   // (así el navegador no recalcula la página varias veces por fotograma).
   let scrolled = null, onDark = null, away = null;
   const footerZone = document.querySelector('.c-footer');
-  const onScroll = () => {
-    const probe = 52;
-    // La barra se retira cuando el pie ya ha llegado arriba del todo
-    const aw = footerZone ? footerZone.getBoundingClientRect().top < 0 : false;
-    const s = window.scrollY > 10;
-    const d = darkZones.some((z) => {
+
+  // Antes se medían las 4 secciones oscuras más el pie EN CADA FOTOGRAMA de scroll:
+  // 5 lecturas que obligan al navegador a recalcular la página. Ahora las posiciones se
+  // miden una sola vez (y cuando algo cambia de tamaño) y se guardan en coordenadas del
+  // documento, así que durante el scroll solo quedan comparaciones de números.
+  const PROBE = 52;
+  let zoneTop = new Float64Array(darkZones.length);
+  let zoneBottom = new Float64Array(darkZones.length);
+  let footerTop = Infinity;
+  const measureZones = () => {
+    const sy = window.scrollY;
+    darkZones.forEach((z, i) => {
       const r = z.getBoundingClientRect();
-      return r.top <= probe && r.bottom > probe;
+      zoneTop[i] = r.top + sy; zoneBottom[i] = r.bottom + sy;
     });
+    footerTop = footerZone ? footerZone.getBoundingClientRect().top + sy : Infinity;
+  };
+
+  const onScroll = () => {
+    const sy = window.scrollY;
+    const probe = sy + PROBE;
+    // La barra se retira cuando el pie ya ha llegado arriba del todo
+    const aw = sy > footerTop;
+    const s = sy > 10;
+    let d = false;
+    for (let i = 0; i < zoneTop.length; i++) {
+      if (probe >= zoneTop[i] && probe < zoneBottom[i]) { d = true; break; }
+    }
     if (s !== scrolled) { scrolled = s; html.classList.toggle('has-scrolled', s); }
     if (d !== onDark) { onDark = d; html.classList.toggle('header-on-dark', d); }
     if (aw !== away) { away = aw; html.classList.toggle('header-away', aw); }
   };
+  // Velocidad de scroll compartida (píxeles por segundo, suavizada). Los fondos decorativos
+  // la usan para saltarse fotogramas cuando la página va muy rápida: a 1500 px/s nadie
+  // distingue el detalle de la red, y el hilo principal queda libre para mover el scroll.
+  let scrollVel = 0;
+  let velY = window.scrollY, velT = performance.now();
+  const sampleVel = () => {
+    const now = performance.now(), sy = window.scrollY;
+    const dt = now - velT;
+    if (dt >= 8) {
+      const v = Math.abs(sy - velY) / dt * 1000;
+      scrollVel += (v - scrollVel) * 0.35;
+      velY = sy; velT = now;
+    }
+  };
+
   // Los avisos de scroll se agrupan en uno por fotograma
   let uiQueued = false;
   const queueUI = () => {
     if (uiQueued) return;
     uiQueued = true;
-    requestAnimationFrame(() => { uiQueued = false; onScroll(); updateSticky(); updatePills(); updateCardsReveal(); });
+    requestAnimationFrame(() => {
+      uiQueued = false;
+      sampleVel();
+      onScroll(); updateSticky(); updatePills(); updateCardsReveal();
+    });
   };
   window.addEventListener('scroll', queueUI, { passive: true });
   window.addEventListener('resize', queueUI, { passive: true });
+
+  // Las posiciones guardadas se refrescan solo cuando algo puede haberlas movido:
+  // al cambiar el tamaño de la página, al entrar las fuentes y tras recalcular ScrollTrigger
+  // (que inserta separadores al fijar el hero). Nunca durante el scroll.
+  const remeasure = () => { measureZones(); onScroll(); };
+  let bodyH = 0;
+  new ResizeObserver(() => {
+    const h = document.body.scrollHeight;
+    if (h === bodyH) return;
+    bodyH = h; remeasure();
+  }).observe(document.body);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
+  if (window.ScrollTrigger) ScrollTrigger.addEventListener('refresh', remeasure);
+  measureZones();
   onScroll();
 
   /* ---------- Botón fijo de WhatsApp (móvil/tablet) ----------
@@ -3002,25 +3043,41 @@ html.reduced-motion .text-reveal-overlay { display: none; }
   /* =========================================================
      BOTÓN PRINCIPAL — morphing de formas (0.3s power2.out)
      ========================================================= */
+  /* Morphing de las dos formas del botón, sin MorphSVGPlugin (21 KB menos).
+     Cada par (reposo / al pasar por encima) viene ya normalizado a curvas cúbicas
+     equivalentes: mismo número de segmentos y mismo punto de partida. Así basta con
+     interpolar número a número. Las formas reproducen exactamente las originales.
+     Formato: [x0, y0, luego grupos de 6: c1x c1y c2x c2y x y]. */
   const SHAPES = {
-    text: {
-      default: 'M0 0h5.63c7.808 0 13.536 7.337 11.642 14.91l-6.09 24.359A11.527 11.527 0 0 1 0 48V0Z',
-      hover: 'M0 0c5.29 0 9.9 3.6 11.183 8.731l6.09 24.359C19.165 40.663 13.437 48 5.63 48H0V0Z',
-    },
-    blob: {
-      default: 'M6.728 9.09A12 12 0 0 1 18.369 0H39c6.627 0 12 5.373 12 12v24c0 6.627-5.373 12-12 12H12.37C4.561 48-1.167 40.663.727 33.09l6-24Z',
-      hover: 'M.728 14.91C-1.166 7.338 4.562 0 12.369 0H39c6.628 0 12 5.373 12 12v24c0 6.627-5.372 12-12 12H18.37a12 12 0 0 1-11.641-9.09l-6-24Z',
-    },
+    text: { a: [0,0,1.877,0,3.753,0,5.63,0,13.438,0,19.166,7.337,17.272,14.91,15.242,23.03,13.212,31.149,11.182,39.269,9.899,44.4,5.289,48,0,48,0,32,0,16,0,0,0,0,0,0,0,0], b: [0,0,5.29,0,9.9,3.6,11.183,8.731,13.213,16.851,15.243,24.97,17.273,33.09,19.165,40.663,13.437,48,5.63,48,3.753,48,1.877,48,0,48,0,32,0,16,0,0,0,0,0,0,0,0] },
+    blob: { a: [6.728,9.09,8.063,3.748,12.863,0,18.369,0,25.246,0,32.123,0,39,0,45.627,0,51,5.373,51,12,51,20,51,28,51,36,51,42.627,45.627,48,39,48,30.123,48,21.247,48,12.37,48,4.561,48,-1.167,40.663,0.727,33.09,2.727,25.09,4.727,17.09,6.727,9.09,6.727,9.09,6.728,9.09,6.728,9.09], b: [0.728,14.91,-1.166,7.338,4.562,0,12.369,0,21.246,0,30.123,0,39,0,45.628,0,51,5.373,51,12,51,20,51,28,51,36,51,42.627,45.628,48,39,48,32.123,48,25.247,48,18.37,48,12.864,48,8.064,44.252,6.729,38.91,4.729,30.91,2.729,22.91,0.729,14.91,0.729,14.91,0.728,14.91,0.728,14.91] },
   };
-  if (MOTION && window.MorphSVGPlugin) {
+  // Un búfer por forma, reutilizado: interpolar no genera basura que recoger
+  const MIXBUF = { text: new Float64Array(SHAPES.text.a.length), blob: new Float64Array(SHAPES.blob.a.length) };
+  function morphPath(key, p) {
+    const { a, b } = SHAPES[key], o = MIXBUF[key];
+    for (let i = 0; i < o.length; i++) o[i] = a[i] + (b[i] - a[i]) * p;
+    let d = 'M' + o[0].toFixed(2) + ' ' + o[1].toFixed(2);
+    for (let i = 2; i < o.length; i += 6) {
+      d += 'C' + o[i].toFixed(2) + ' ' + o[i + 1].toFixed(2) + ' ' + o[i + 2].toFixed(2) + ' '
+        + o[i + 3].toFixed(2) + ' ' + o[i + 4].toFixed(2) + ' ' + o[i + 5].toFixed(2);
+    }
+    return d + 'Z';
+  }
+  if (MOTION) {
     document.querySelectorAll('.btn1').forEach((btn) => {
       const t = btn.querySelector('.label_corner path');
       const b = btn.querySelector('.btn_icon path');
       if (!t || !b) return;
-      const morph = (state) => {
-        gsap.to(t, { morphSVG: SHAPES.text[state], duration: 0.3, ease: 'power2.out' });
-        gsap.to(b, { morphSVG: SHAPES.blob[state], duration: 0.3, ease: 'power2.out' });
+      const st = { p: 0 };
+      const paint = () => {
+        t.setAttribute('d', morphPath('text', st.p));
+        b.setAttribute('d', morphPath('blob', st.p));
       };
+      // Solo corre mientras dura la transición de 0,3 s: en reposo no hay bucle ninguno
+      const morph = (state) => gsap.to(st, {
+        p: state === 'hover' ? 1 : 0, duration: 0.3, ease: 'power2.out', overwrite: true, onUpdate: paint,
+      });
       btn.addEventListener('mouseenter', () => morph('hover'));
       btn.addEventListener('mouseleave', () => { if (document.activeElement !== btn) morph('default'); });
       btn.addEventListener('focus', () => { if (btn.matches(':focus-visible')) morph('hover'); });
@@ -3107,10 +3164,15 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       const w = this.c.clientWidth, h = this.c.clientHeight;
       if (!w || !h) return;
       this.mobile = w < 768;
-      // Densidad limitada y tope de ~4,5 millones de píxeles de dibujo por lienzo:
-      // en pantallas 4K/Retina grandes evita rellenar ~15 Mpx en cada fotograma.
-      const MAX_PX = 4.5e6;
-      const dpr = Math.min(window.devicePixelRatio || 1, this.mobile ? 1.5 : 2, Math.sqrt(MAX_PX / (w * h)));
+      // Posición del centro de la sección en coordenadas del documento, para que render()
+      // no tenga que medir nada en cada fotograma.
+      const zb = this.zone.getBoundingClientRect();
+      this.zoneMid = zb.top + window.scrollY + zb.height / 2;
+      // Densidad limitada y tope de píxeles de dibujo por lienzo. En móvil se baja de 1,5 a
+      // 1,25: son puntos de 2 px y líneas de 1 px en movimiento, donde la diferencia no se ve,
+      // pero el relleno por fotograma baja un 30 %.
+      const MAX_PX = this.mobile ? 2.2e6 : 4.5e6;
+      const dpr = Math.min(window.devicePixelRatio || 1, this.mobile ? 1.25 : 2, Math.sqrt(MAX_PX / (w * h)));
       this.w = w; this.h = h;
       this.c.width = Math.round(w * dpr); this.c.height = Math.round(h * dpr);
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -3203,11 +3265,21 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       const k = 1 - Math.pow(0.94, dt / 16.7);
       p.x += (p.tx - p.x) * k; p.y += (p.ty - p.y) * k;
 
-      // Calidad adaptable: si durante ~2 s la mayoría de fotogramas pasan de 24 ms, menos nodos
+      // Calidad adaptable. Antes hacían falta ~2 s de fotogramas malos para reaccionar y la
+      // calidad solo podía bajar. Ahora la ventana es de 30 fotogramas (medio segundo), el
+      // listón es 20 ms (50 fps) y puede volver a subir cuando el aparato aguanta: así un
+      // móvil justo se alivia enseguida y un ordenador no se queda degradado para siempre.
       this.frames++;
-      if (dt > 24) this.slow++;
-      if (this.frames >= 120) {
-        if (this.slow > 70 && this.quality > 0.5) { this.quality = Math.max(0.5, this.quality * 0.75); this.build(); }
+      if (dt > 20) this.slow++;
+      if (this.frames >= 30) {
+        const malos = this.slow / this.frames;
+        if (malos > 0.4 && this.quality > 0.4) {
+          this.quality = Math.max(0.4, this.quality - 0.15);
+          this.build();
+        } else if (malos < 0.05 && this.quality < 1) {
+          this.quality = Math.min(1, this.quality + 0.1);
+          this.build();
+        }
         this.frames = 0; this.slow = 0;
       }
     }
@@ -3217,8 +3289,11 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       if (!w || !n) return;
       ctx.clearRect(0, 0, w, h);
       const mx = this.ptr.x * w, my = this.ptr.y * h;
-      const zr = this.zone.getBoundingClientRect();
-      const sc = Math.max(-1.2, Math.min(1.2, (zr.top + zr.height / 2 - window.innerHeight / 2) / window.innerHeight));
+      // El centro de la sección se guarda en coordenadas del documento al medir, así que aquí
+      // basta una resta. Antes se medía el rectángulo en cada fotograma, lo que obliga al
+      // navegador a recalcular la página 60 veces por segundo y por lienzo.
+      const vh = window.innerHeight;
+      const sc = Math.max(-1.2, Math.min(1.2, (this.zoneMid - window.scrollY - vh / 2) / vh));
       const pxOff = this.ptr.x - 0.5, pyOff = this.ptr.y - 0.5;
       const tt = t * 0.00006;
       // Líneas y atracción hacia el cursor solo con un cursor o dedo real (no con la deriva automática)
@@ -3327,7 +3402,10 @@ html.reduced-motion .text-reveal-overlay { display: none; }
         const dt = Math.min(now - last, 40); last = now;
         this.t += dt;
         this.update(dt, now);
-        this.render(dt);
+        // Con la página moviéndose rápido, el fondo se dibuja uno de cada dos fotogramas.
+        // El movimiento interno sigue calculándose, así que al parar no hay ningún salto.
+        this.half = scrollVel > 1500 ? !this.half : false;
+        if (!this.half) this.render(dt);
         this.raf = requestAnimationFrame(tick);
       };
       this.raf = requestAnimationFrame(tick);
@@ -3643,12 +3721,23 @@ html.reduced-motion .text-reveal-overlay { display: none; }
     const reads = pills.map((p) => p.el.getBoundingClientRect().top);
     pills.forEach((p, k) => {
       const top = reads[k];
+      // Si la sección aún no asoma por abajo, no hay nada que recortar: se deja en su estado
+      // inicial y se sale. Antes se recalculaban y reescribían las tres secciones en cada
+      // fotograma, estuvieran donde estuvieran, y cada escritura de clip-path repinta la
+      // sección entera: era el segundo coste más caro del scroll.
+      if (top > vh) {
+        const inicial = `inset(0px ${p.side.toFixed(0)}px round ${small ? 110 : 220}px)`;
+        if (inicial !== p.clip) { p.el.style.clipPath = inicial; p.clip = inicial; }
+        return;
+      }
       // Termina al llegar al 10 % superior (o donde quede al final de la página, si no llega)
       const endTop = Math.max(vh * 0.1, top + sy - maxY);
       const x = Math.min(1, Math.max(0, (vh - top) / Math.max(1, vh - endTop)));
       const e = x * x * (3 - 2 * x);
-      const clip = e >= 0.999 ? 'none'
-        : `inset(0px ${((1 - e) * p.side).toFixed(1)}px round ${(20 + (1 - e) * (small ? 90 : 200)).toFixed(1)}px)`;
+      // Valores redondeados a 1 px y 2 px: el recorrido se ve igual de suave y la cadena
+      // cambia (y por tanto repinta) muchas menos veces.
+      const clip = e >= 0.995 ? 'none'
+        : `inset(0px ${Math.round((1 - e) * p.side)}px round ${(Math.round((20 + (1 - e) * (small ? 90 : 200)) / 2) * 2)}px)`;
       if (clip !== p.clip) { p.el.style.clipPath = clip; p.clip = clip; }
     });
   }
@@ -3928,13 +4017,17 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       const bl = Math.max(0, b.l - pad), bt = Math.max(0, b.t - pad);
       const br = Math.max(0, cr.width - (b.l + b.w + pad)), bb = Math.max(0, cr.height - (b.t + b.h + pad));
       const rad = Math.min(b.w, b.h) / 2 + pad;
-      const clip = e >= 0.999 ? 'none'
-        : `inset(${(bt * (1 - e)).toFixed(1)}px ${(br * (1 - e)).toFixed(1)}px ${(bb * (1 - e)).toFixed(1)}px ${(bl * (1 - e)).toFixed(1)}px round ${(20 + (rad - 20) * (1 - e)).toFixed(1)}px)`;
+      // Mismo criterio que en las secciones: valores redondeados a 1 px (2 px el radio) para
+      // que la cadena cambie mucho menos a menudo. Cada cambio repinta la tarjeta entera.
+      const q = 1 - e;
+      const clip = e >= 0.995 ? 'none'
+        : `inset(${Math.round(bt * q)}px ${Math.round(br * q)}px ${Math.round(bb * q)}px ${Math.round(bl * q)}px round ${Math.round((20 + (rad - 20) * q) / 2) * 2}px)`;
       if (clip !== cd.clip) { cd.el.style.clipPath = clip; cd.clip = clip; }
       // El icono se dibuja en cuanto asoma la burbuja (una sola vez por tarjeta)
       if (e > 0.02) drawCardIcon(cd.el);
-      // Número y texto aparecen en el último tramo de la apertura
-      const t = Math.round(Math.min(1, Math.max(0, (e - 0.6) / 0.4)) * 1000) / 1000;
+      // Número y texto aparecen en el último tramo de la apertura (redondeado a centésimas:
+      // escribir opacidad y transform en 9 elementos es barato, pero no gratis)
+      const t = Math.round(Math.min(1, Math.max(0, (e - 0.6) / 0.4)) * 100) / 100;
       if (t !== cd.t) {
         cd.t = t;
         cd.fade.forEach((f) => { f.style.opacity = t; f.style.transform = t >= 1 ? '' : `translateY(${(14 * (1 - t)).toFixed(1)}px)`; });
