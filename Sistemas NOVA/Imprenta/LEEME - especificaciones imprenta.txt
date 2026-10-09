@@ -1,7 +1,7 @@
-NOVA - Tarjeta de visita 90x50 mm - imprenta v8
+NOVA - Tarjeta de visita 90x50 mm - imprenta v9
 ================================================
 
-Archivo: NOVA - Tarjeta de visita 90x50 mm imprenta v8.pdf
+Archivo: NOVA - Tarjeta de visita 90x50 mm imprenta v9.pdf
 Páginas: 1 = anverso (NOVA), 2 = reverso (datos de contacto)
 
 Formato final (TrimBox):   90 x 50 mm
@@ -30,4 +30,6 @@ no se superpone a la letra); reverso - el gris llega hasta la línea de
 contorno de la malla, sin sombras ni manchas, y la malla se ha compactado un
 3,4 % en vertical para que sus nodos inferiores queden a 1,7 mm del corte
 (en la v4 estaban a 0,2 mm y podían salir cortados).
+v9: anverso - la red de la "A" termina en su nodo superior (ya no sube por
+el borde de la punta hasta el pico).
 Distancia mínima de cualquier elemento blanco al corte: 1,7 mm.
