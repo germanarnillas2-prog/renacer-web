@@ -1,7 +1,7 @@
-NOVA - Tarjeta de visita 90x50 mm - imprenta v7
+NOVA - Tarjeta de visita 90x50 mm - imprenta v8
 ================================================
 
-Archivo: NOVA - Tarjeta de visita 90x50 mm imprenta v7.pdf
+Archivo: NOVA - Tarjeta de visita 90x50 mm imprenta v8.pdf
 Páginas: 1 = anverso (NOVA), 2 = reverso (datos de contacto)
 
 Formato final (TrimBox):   90 x 50 mm
@@ -25,3 +25,9 @@ v6: reverso - cerrada la base de la malla (en la v4 original quedaba cortada
 por la línea de corte); ninguna otra cosa cambia respecto a la v5.
 v7: reverso - la malla empieza en su nodo superior (sin línea por encima);
 anverso - la punta de la "A" es una sola pieza de un único tono.
+v8: anverso - la pata izquierda de la "A" queda por delante de la red (la red
+no se superpone a la letra); reverso - el gris llega hasta la línea de
+contorno de la malla, sin sombras ni manchas, y la malla se ha compactado un
+3,4 % en vertical para que sus nodos inferiores queden a 1,7 mm del corte
+(en la v4 estaban a 0,2 mm y podían salir cortados).
+Distancia mínima de cualquier elemento blanco al corte: 1,7 mm.
