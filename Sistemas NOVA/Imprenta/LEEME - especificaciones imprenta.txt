@@ -1,0 +1,22 @@
+NOVA - Tarjeta de visita 90x50 mm - imprenta v5
+================================================
+
+Archivo: NOVA - Tarjeta de visita 90x50 mm imprenta v5.pdf
+Páginas: 1 = anverso (NOVA), 2 = reverso (datos de contacto)
+
+Formato final (TrimBox):   90 x 50 mm
+Sangrado (BleedBox):       3 mm por lado -> documento de 96 x 56 mm
+Color:                     CMYK (sin RGB, sin transparencias, sin sobreimpresiones)
+  - Fondo:                 negro enriquecido C40 M30 Y30 K100 (TAC 200 %)
+  - Grises de las letras:  solo tinta K (sin dominantes de color)
+  - Líneas, nodos y texto: blanco papel (reserva), con un perfil de seguridad
+                           K100 de 0,085 mm alrededor para que un posible
+                           desregistro de CMY no tiña los blancos finos
+Gráficos:                  100 % vectoriales (letras, red de líneas, nodos)
+Textos:                    convertidos a trazados (Roboto Condensed Bold/Light),
+                           sin fuentes que incrustar
+Textura de las letras:     imagen CMYK a 600 ppi, recortada por trazados vectoriales
+Grosor mínimo de línea:    0,10 mm (0,28 pt)
+
+Nota: el anverso conserva exactamente la posición de la v4. La "A" queda a
+1,8 mm de la línea de corte derecha (la "N" a 3,0 mm de la izquierda).
