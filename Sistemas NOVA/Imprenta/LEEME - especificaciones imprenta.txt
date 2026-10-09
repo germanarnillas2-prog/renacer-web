@@ -1,7 +1,7 @@
-NOVA - Tarjeta de visita 90x50 mm - imprenta v5
+NOVA - Tarjeta de visita 90x50 mm - imprenta v6
 ================================================
 
-Archivo: NOVA - Tarjeta de visita 90x50 mm imprenta v5.pdf
+Archivo: NOVA - Tarjeta de visita 90x50 mm imprenta v6.pdf
 Páginas: 1 = anverso (NOVA), 2 = reverso (datos de contacto)
 
 Formato final (TrimBox):   90 x 50 mm
@@ -20,3 +20,6 @@ Grosor mínimo de línea:    0,10 mm (0,28 pt)
 
 Nota: el anverso conserva exactamente la posición de la v4. La "A" queda a
 1,8 mm de la línea de corte derecha (la "N" a 3,0 mm de la izquierda).
+
+v6: reverso - cerrada la base de la malla (en la v4 original quedaba cortada
+por la línea de corte); ninguna otra cosa cambia respecto a la v5.
