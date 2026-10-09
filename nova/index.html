@@ -1295,7 +1295,10 @@ html.motion .c-usp-cards .cards_item.is-drawn .card_icon svg *:nth-child(n+4) { 
 /* ---------- Rejilla de reels ---------- */
 .c-posts .work_label { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .c-posts .work_label::after { content: ""; flex: 1; height: 1px; background: rgba(var(--ink-rgb), .14); }
-.c-posts .reels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; list-style: none; margin: 0 0 clamp(32px, 5vw, 56px); padding: 0; }
+/* En un móvil, dos columnas dejan la tarjeta en ~170 px: el rótulo del reel (que es lo que
+   hace gracia) no se lee y las cifras se parten en dos líneas. Una sola columna hasta 560 px. */
+.c-posts .reels { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; list-style: none; margin: 0 0 clamp(32px, 5vw, 56px); padding: 0; }
+@media (min-width: 560px) { .c-posts .reels { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } }
 /* El 9:16 de un reel crece muy rápido: sin tope, tres tarjetas ocupan dos pantallas.
    Se acota el ancho de la rejilla para que cada tarjeta ronde los 270-300 px. */
 @media (min-width: 760px) { .c-posts .reels { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; max-width: 900px; } }
