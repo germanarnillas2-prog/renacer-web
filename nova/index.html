@@ -133,6 +133,7 @@ html.motion .btn1.is-pressed, html.motion .stickycta_btn.is-pressed { transform:
 @media (min-width: 1024px) { .c-faq .faq_head { position: sticky; top: 120px; } }
 .c-faq .faq_heading { font-size: clamp(2rem, 1.3rem + 2.6vw, 3.25rem); line-height: 1.08; letter-spacing: -0.02em; max-width: 15ch; }
 .c-faq .faq_note { max-width: 40ch; color: var(--color-graphite); }
+.c-faq .faq_col { min-width: 0; }
 .c-faq .faq_list { display: flex; flex-direction: column; border-top: 1px solid rgba(var(--ink-rgb), .14); }
 .c-faq .faq_item { border-bottom: 1px solid rgba(var(--ink-rgb), .14); }
 .c-faq .faq_q {
@@ -165,6 +166,8 @@ html.motion .btn1.is-pressed, html.motion .stickycta_btn.is-pressed { transform:
 .c-faq .faq_ico::after { transform: translate(-50%, -50%) rotate(90deg); }
 .c-faq .faq_item[open] .faq_ico::before { transform: translate(-50%, -50%) rotate(45deg); }
 .c-faq .faq_item[open] .faq_ico::after { transform: translate(-50%, -50%) rotate(135deg); }
+.c-faq .faq_more { margin-top: 24px; color: var(--color-graphite); max-width: 56ch; }
+.c-faq .faq_more a { color: var(--color-ink); text-decoration: underline; text-underline-offset: 4px; }
 .c-faq .faq_a { padding: 0 48px 24px 0; max-width: 62ch; color: var(--color-graphite); }
 html.motion .c-faq .faq_item[open] .faq_a { animation: faq-in .5s var(--ease-1) both; }
 @keyframes faq-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
@@ -2267,34 +2270,42 @@ html.reduced-motion .text-reveal-overlay { display: none; }
     "mainEntity": [
       {
         "@type": "Question",
+        "name": "¿Qué incluye exactamente por 275 € al mes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cuatro reels y unas quince historias al mes: tu negocio publica casi a diario. Vamos a grabar a tu local, lo editamos todo y cada pieza se publica en Instagram, TikTok, Facebook y YouTube Shorts. El mismo trabajo, cuatro sitios."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Cuánto tiempo me va a quitar a mí?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Un día de grabación. Poco más. Vamos a tu negocio, grabamos todo el mes de una vez y a partir de ahí te olvidas: editamos, escribimos y publicamos nosotros. Si necesitas algo concreto, nos lo dices y lo hacemos."
+        }
+      },
+      {
+        "@type": "Question",
         "name": "¿Hay permanencia?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No. Trabajamos mes a mes. Si en algún momento deja de compensarte, lo dejas avisando con 30 días. Preferimos que te quedes porque funciona, no porque hayas firmado algo."
+          "text": "No. Mes a mes. Si en algún momento deja de compensarte, lo dejas avisando con 30 días. Preferimos que te quedes porque funciona."
         }
       },
       {
         "@type": "Question",
-        "name": "¿Los 275 € incluyen la grabación?",
+        "name": "¿Cuándo empiezo a notar algo?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Sí. Vamos a tu negocio a grabar foto y vídeo con nuestro equipo, lo editamos y lo publicamos en Instagram, TikTok, Facebook y YouTube Shorts. No es contenido de banco de imágenes ni fotos del móvil: es tu negocio, grabado por un filmmaker."
+          "text": "El contenido se nota la primera semana: tu perfil deja de parecer abandonado. Que traiga clientes nuevos de forma sostenida lleva dos o tres meses, porque esto funciona por acumulación. Los sistemas sí son inmediatos: el día que se activa el WhatsApp con IA dejas de perder mensajes."
         }
       },
       {
         "@type": "Question",
-        "name": "¿Los anuncios están incluidos en los 300 € al mes?",
+        "name": "¿La IA responde como un robot? ¿Lo van a notar mis clientes?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No, y conviene tenerlo claro desde el principio. Esos 300 € son nuestro trabajo de montar y gestionar las campañas. Lo que inviertes en Meta y Google lo pagas tú directamente a ellos y lo decides tú. Así ves exactamente qué va a la plataforma y qué va a nosotros."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "¿Cuánto tardo en ver resultados?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Las primeras conversaciones por campañas suelen llegar en dos o tres semanas. Las redes y la ficha de Google van más despacio: cuenta con dos o tres meses para notar el cambio. Si alguien te promete clientes en siete días, desconfía."
+          "text": "No suena a robot. La configuramos con tu forma de hablar, tu carta, tus horarios y tus precios, así que responde lo que responderías tú, pero a las tres de la mañana y sin hacer esperar a nadie. Y en cuanto la conversación necesita una persona, o el cliente la pide, te la pasa a ti."
         }
       },
       {
@@ -2302,23 +2313,7 @@ html.reduced-motion .text-reveal-overlay { display: none; }
         "name": "Ya tengo a alguien llevándome las redes.",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Perfecto, entonces te interesa la parte que casi nadie cubre: lo que pasa después de que alguien te escriba. Atenderle al momento, agendarle, pedirle la reseña y conseguir que vuelva. Podemos trabajar solo esa parte y dejar las redes como están."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "¿Esto funciona en mi sector?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Trabajamos con restaurantes, peluquerías, clínicas, comercio y servicios profesionales. Si tu negocio es local y vive de que te encuentren, te escriban y repitan, encaja. En la reunión de 15 minutos te decimos si creemos que no, y te lo decimos."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "¿Me obliga a cambiar de herramientas?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "No. Nos adaptamos a lo que ya uses. Si vemos que algo se te queda corto te lo decimos, pero la decisión de cambiar es tuya."
+          "text": "Perfecto, no cambies nada. Te interesa lo que pasa después de que alguien te escriba: atenderle al momento aunque sean las once de la noche, agendarle, recordarle la cita, pedirle la reseña y conseguir que vuelva. Montamos solo esa parte y tus redes se quedan como están."
         }
       }
     ]
@@ -2754,37 +2749,38 @@ html.reduced-motion .text-reveal-overlay { display: none; }
         <div class="faq_head">
           <span class="u-tag"><span class="tag_dot" aria-hidden="true"></span>Preguntas frecuentes</span>
           <h2 class="faq_heading" id="faq-title" data-text-reveal>Lo que nos preguntan <span class="u-muted">antes de empezar.</span></h2>
-          <p class="faq_note">Si te queda alguna duda que no está aquí, pregúntanosla directamente: te responde Germán, no un formulario.</p>
+          <p class="faq_note">Las dudas que más nos llegan antes de empezar a trabajar juntos.</p>
         </div>
-        <div class="faq_list">
+        <div class="faq_col">
+          <div class="faq_list">
+            <details class="faq_item">
+              <summary class="faq_q">¿Qué incluye exactamente por 275 € al mes?<span class="faq_ico" aria-hidden="true"></span></summary>
+              <p class="faq_a">Cuatro reels y unas quince historias al mes: tu negocio publica casi a diario. Vamos a grabar a tu local, lo editamos todo y cada pieza se publica en Instagram, TikTok, Facebook y YouTube Shorts. El mismo trabajo, cuatro sitios.</p>
+            </details>
+            <details class="faq_item">
+              <summary class="faq_q">¿Cuánto tiempo me va a quitar a mí?<span class="faq_ico" aria-hidden="true"></span></summary>
+              <p class="faq_a">Un día de grabación. Poco más. Vamos a tu negocio, grabamos todo el mes de una vez y a partir de ahí te olvidas: editamos, escribimos y publicamos nosotros. Si necesitas algo concreto, nos lo dices y lo hacemos.</p>
+            </details>
             <details class="faq_item">
               <summary class="faq_q">¿Hay permanencia?<span class="faq_ico" aria-hidden="true"></span></summary>
-              <p class="faq_a">No. Trabajamos mes a mes. Si en algún momento deja de compensarte, lo dejas avisando con 30 días. Preferimos que te quedes porque funciona, no porque hayas firmado algo.</p>
+              <p class="faq_a">No. Mes a mes. Si en algún momento deja de compensarte, lo dejas avisando con 30 días. Preferimos que te quedes porque funciona.</p>
             </details>
             <details class="faq_item">
-              <summary class="faq_q">¿Los 275 € incluyen la grabación?<span class="faq_ico" aria-hidden="true"></span></summary>
-              <p class="faq_a">Sí. Vamos a tu negocio a grabar foto y vídeo con nuestro equipo, lo editamos y lo publicamos en Instagram, TikTok, Facebook y YouTube Shorts. No es contenido de banco de imágenes ni fotos del móvil: es tu negocio, grabado por un filmmaker.</p>
+              <summary class="faq_q">¿Cuándo empiezo a notar algo?<span class="faq_ico" aria-hidden="true"></span></summary>
+              <p class="faq_a">El contenido se nota la primera semana: tu perfil deja de parecer abandonado. Que traiga clientes nuevos de forma sostenida lleva dos o tres meses, porque esto funciona por acumulación. Los sistemas sí son inmediatos: el día que se activa el WhatsApp con IA dejas de perder mensajes.</p>
             </details>
             <details class="faq_item">
-              <summary class="faq_q">¿Los anuncios están incluidos en los 300 € al mes?<span class="faq_ico" aria-hidden="true"></span></summary>
-              <p class="faq_a">No, y conviene tenerlo claro desde el principio. Esos 300 € son nuestro trabajo de montar y gestionar las campañas. Lo que inviertes en Meta y Google lo pagas tú directamente a ellos y lo decides tú. Así ves exactamente qué va a la plataforma y qué va a nosotros.</p>
-            </details>
-            <details class="faq_item">
-              <summary class="faq_q">¿Cuánto tardo en ver resultados?<span class="faq_ico" aria-hidden="true"></span></summary>
-              <p class="faq_a">Las primeras conversaciones por campañas suelen llegar en dos o tres semanas. Las redes y la ficha de Google van más despacio: cuenta con dos o tres meses para notar el cambio. Si alguien te promete clientes en siete días, desconfía.</p>
+              <summary class="faq_q">¿La IA responde como un robot? ¿Lo van a notar mis clientes?<span class="faq_ico" aria-hidden="true"></span></summary>
+              <p class="faq_a">No suena a robot. La configuramos con tu forma de hablar, tu carta, tus horarios y tus precios, así que responde lo que responderías tú, pero a las tres de la mañana y sin hacer esperar a nadie. Y en cuanto la conversación necesita una persona, o el cliente la pide, te la pasa a ti.</p>
             </details>
             <details class="faq_item">
               <summary class="faq_q">Ya tengo a alguien llevándome las redes.<span class="faq_ico" aria-hidden="true"></span></summary>
-              <p class="faq_a">Perfecto, entonces te interesa la parte que casi nadie cubre: lo que pasa después de que alguien te escriba. Atenderle al momento, agendarle, pedirle la reseña y conseguir que vuelva. Podemos trabajar solo esa parte y dejar las redes como están.</p>
+              <p class="faq_a">Perfecto, no cambies nada. Te interesa lo que pasa después de que alguien te escriba: atenderle al momento aunque sean las once de la noche, agendarle, recordarle la cita, pedirle la reseña y conseguir que vuelva. Montamos solo esa parte y tus redes se quedan como están.</p>
             </details>
-            <details class="faq_item">
-              <summary class="faq_q">¿Esto funciona en mi sector?<span class="faq_ico" aria-hidden="true"></span></summary>
-              <p class="faq_a">Trabajamos con restaurantes, peluquerías, clínicas, comercio y servicios profesionales. Si tu negocio es local y vive de que te encuentren, te escriban y repitan, encaja. En la reunión de 15 minutos te decimos si creemos que no, y te lo decimos.</p>
-            </details>
-            <details class="faq_item">
-              <summary class="faq_q">¿Me obliga a cambiar de herramientas?<span class="faq_ico" aria-hidden="true"></span></summary>
-              <p class="faq_a">No. Nos adaptamos a lo que ya uses. Si vemos que algo se te queda corto te lo decimos, pero la decisión de cambiar es tuya.</p>
-            </details>
+        </div>
+          <p class="faq_more">¿Tienes otra duda? Pregúntamela directamente: te responde Germán, no un formulario.
+            <a href="https://wa.me/34653108145?text=Hola%20Germ%C3%A1n%2C%20tengo%20un%20negocio%20y%20quiero%20ver%20qu%C3%A9%20podr%C3%ADamos%20mejorar%20o%20automatizar." target="_blank" rel="noopener noreferrer" data-wa>Abrir WhatsApp<span class="arrow-ne" aria-hidden="true"></span><span class="u-sr"> (se abre en otra pestaña)</span></a>
+          </p>
         </div>
       </div>
     </section>
@@ -4047,7 +4043,7 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       corto: 'Restauración', en: 'En un restaurante, cafetería o heladería',
       q2: [['No tengo tiempo para las redes', 'camera', 'Gestión de tus redes con contenido propio: fotografía gastronómica y vídeo que abren el apetito, publicados con constancia.'],
         ['Gestionar reservas y pedidos', 'calendar', 'Reservas por WhatsApp y por la web que entran solas en tu agenda, con confirmación y recordatorio automáticos.'],
-        ['Días flojos y mesas vacías', 'table', 'Campañas en Meta y Google y mensajes a tus clientes para llenar los días flojos, medidos para saber cuáles funcionan.'],
+        ['Días flojos y mesas vacías', 'table', 'Contenido que enseña tus días flojos con otra cara y mensajes automáticos a tus clientes de siempre para llenarlos. Si hace falta empujar más, añadimos campañas.'],
         ['Pocas reseñas y clientes que no vuelven', 'star', 'Petición automática de reseña después de cada visita y un sistema que invita a tus clientes a volver.']],
       q3: [['Más clientes nuevos', 'trend', 'clientes'], ['Que mis clientes repitan', 'repeat', 'fidelizar'], ['Mejor imagen en redes', 'camera', 'imagen'], ['No lo tengo claro', 'help', 'nose']],
     },
@@ -4056,13 +4052,13 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       q2: [['No tengo tiempo para las redes', 'camera', 'Contenido de tus trabajos con foto y vídeo profesional y gestión de tus redes, para que se vea lo bien que trabajas.'],
         ['Gestionar citas por WhatsApp', 'chat', 'Agenda online y un WhatsApp que responde solo: tus clientas reservan a cualquier hora sin que tengas que soltar las tijeras.'],
         ['Clientas que no vienen o no vuelven', 'repeat', 'Recordatorios automáticos antes de cada cita y avisos para volver cuando les toque el siguiente servicio.'],
-        ['Conseguir clientas nuevas', 'users', 'Campañas locales y una ficha de Google cuidada para que quien busca salón cerca te encuentre y reserve.']],
+        ['Conseguir clientas nuevas', 'users', 'Contenido de tus trabajos y una ficha de Google cuidada para que quien busca salón cerca te encuentre y reserve. Si quieres acelerarlo, se suman campañas locales.']],
       q3: [['Agenda llena', 'calendar', 'agenda'], ['Que mis clientas repitan', 'repeat', 'fidelizar'], ['Más visibilidad en redes', 'camera', 'imagen'], ['No lo tengo claro', 'help', 'nose']],
     },
     marca: {
       corto: 'Marca personal', en: 'En tu marca personal',
       q2: [['Crear contenido con constancia', 'camera', 'Producción de contenido con foto y vídeo profesional y un plan de publicación que mantiene tu marca activa sin quitarte tiempo.'],
-        ['Convertir seguidores en clientes', 'trend', 'Embudos y campañas que llevan a tus seguidores de un mensaje a una llamada o a una venta.'],
+        ['Convertir seguidores en clientes', 'trend', 'Contenido pensado para vender y un camino claro desde el mensaje hasta la llamada, con respuestas automáticas por el medio. Las campañas, si las quieres.'],
         ['Responder mensajes y consultas', 'chat', 'Respuestas automáticas en Instagram y WhatsApp que atienden al momento y te pasan solo los contactos interesados.'],
         ['Organizar clientes y seguimientos', 'doc', 'Un CRM sencillo con tus contactos, citas y seguimientos automáticos para que nadie se quede sin respuesta.']],
       q3: [['Más alcance y comunidad', 'users', 'visibilidad'], ['Más clientes y ventas', 'trend', 'ventas'], ['Ganar tiempo', 'clock', 'tiempo'], ['No lo tengo claro', 'help', 'nose']],
@@ -4070,7 +4066,7 @@ html.reduced-motion .text-reveal-overlay { display: none; }
     comercio: {
       corto: 'Comercio', en: 'En un comercio o tienda',
       q2: [['No tengo tiempo para las redes', 'camera', 'Gestión de tus redes con foto y vídeo de tus productos, para que quien te sigue quiera venir a verlos.'],
-        ['Atraer clientes a la tienda', 'search', 'Una ficha de Google cuidada y campañas locales para que quien busca lo que vendes cerca te encuentre.'],
+        ['Atraer clientes a la tienda', 'search', 'Contenido de tus productos y una ficha de Google cuidada para que quien busca lo que vendes cerca te encuentre y venga. Con campañas locales si quieres llegar más lejos.'],
         ['Responder dudas de stock y precios', 'chat', 'Un asistente en WhatsApp que responde al momento sobre disponibilidad, precios y horarios, y te avisa si hace falta una persona.'],
         ['Clientes que no vuelven', 'repeat', 'Mensajes y promociones automáticas para que tus clientes vuelvan y repitan compra.']],
       q3: [['Más ventas', 'trend', 'ventas'], ['Que me encuentren en Google', 'search', 'google'], ['Que mis clientes repitan', 'repeat', 'fidelizar'], ['No lo tengo claro', 'help', 'nose']],
@@ -4080,7 +4076,7 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       q2: [['Confirmar y recordar citas', 'calok', 'Confirmaciones y recordatorios automáticos por WhatsApp para cada cita, con opción de cambiarla sin llamar.'],
         ['Responder a pacientes por WhatsApp y teléfono', 'chat', 'Un asistente en WhatsApp y en la web que responde al momento sobre tratamientos, horarios y precios, y te pasa solo lo que necesita a una persona.'],
         ['Huecos por pacientes que no se presentan', 'clock', 'Recordatorios y lista de espera automática: si alguien cancela, el hueco se ofrece solo a otro paciente.'],
-        ['Darme a conocer y conseguir pacientes', 'users', 'Redes con contenido profesional, ficha de Google y campañas locales para pacientes que buscan un centro de confianza cerca.']],
+        ['Darme a conocer y conseguir pacientes', 'users', 'Redes con contenido profesional y una ficha de Google cuidada, para pacientes que buscan un centro de confianza cerca. Las campañas se añaden si quieres ir más rápido.']],
       q3: [['Más pacientes nuevos', 'trend', 'clientes'], ['Agenda llena y sin ausencias', 'calendar', 'agenda'], ['Menos tiempo al teléfono', 'phone', 'tiempo'], ['No lo tengo claro', 'help', 'nose']],
     },
     servicios: {
@@ -4096,7 +4092,7 @@ html.reduced-motion .text-reveal-overlay { display: none; }
       q2: [['No tengo tiempo para las redes', 'camera', 'Gestión de tus redes con contenido propio de foto y vídeo, publicado con constancia y pensado para atraer clientes.'],
         ['Responder mensajes y llamadas', 'chat', 'Un asistente en WhatsApp y en la web que responde al momento sobre horarios, servicios y precios, y te avisa cuando hace falta una persona.'],
         ['Gestionar citas y reservas', 'calendar', 'Una agenda online conectada a WhatsApp, con confirmaciones y recordatorios automáticos que evitan olvidos y huecos.'],
-        ['Conseguir clientes nuevos', 'users', 'Tus redes, tu ficha de Google y tus campañas conectadas para que cada contacto llegue a un mismo sitio y no se pierda.']],
+        ['Conseguir clientes nuevos', 'users', 'Tus redes y tu ficha de Google trabajando juntas, con todos los contactos llegando a un mismo sitio para que no se pierda ninguno. Y campañas, si en algún momento las necesitas.']],
       q3: [['Más clientes', 'trend', 'clientes'], ['Menos trabajo manual', 'clock', 'tiempo'], ['Mejor imagen online', 'image', 'imagen'], ['No lo tengo claro', 'help', 'nose']],
     },
   };
@@ -4596,7 +4592,7 @@ html.reduced-motion .text-reveal-overlay { display: none; }
     };
     // [clave, nombre, subtítulo, qué consigues, qué hacemos]
     const SERV = [
-      ['contenido', 'Contenido', 'Foto y vídeo propios', 'Contenido propio y profesional para tus redes, tu web y Google.', 'Grabamos foto y vídeo en tu negocio, con nuestro propio equipo.'],
+      ['contenido', 'Contenido', 'Foto y vídeo propios', 'Contenido propio y profesional para tus redes, tu web y Google.', 'Grabamos foto y vídeo en tu negocio y lo editamos nosotros.'],
       ['redes', 'Redes sociales', 'Publicación y comunidad', 'Que te descubran y te recuerden.', 'Planificamos, publicamos y cuidamos tu comunidad.'],
       ['google', 'Google y web', 'Ficha, reseñas y web', 'Que te encuentren cuando te buscan.', 'Cuidamos tu ficha de Google, tus reseñas y tu web.'],
       ['whatsapp', 'WhatsApp con IA', 'Al momento, día y noche', 'Ningún mensaje sin respuesta, también de noche.', 'Un asistente con IA que responde y agenda por WhatsApp.'],
